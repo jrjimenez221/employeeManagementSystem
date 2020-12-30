@@ -8,7 +8,6 @@ CREATE TABLE employees(
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(45) NOT NULL,
   role_id INT,
-  manager_id INT,
   PRIMARY KEY (id)
 );
 
@@ -17,6 +16,7 @@ CREATE TABLE role(
   title VARCHAR(30),
   salary DECIMAL,
   department_id INT,
+  reports_to INT,
   PRIMARY KEY (id)
 );
 
