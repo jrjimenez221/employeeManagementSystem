@@ -21,9 +21,7 @@ function start() {
       type: "list",
       message: "What would you like to do?",
       choices: [
-        "View All Employees", //done
-        "View All Employees By Department", //done
-        "View All Employees By Manager", //stuck
+        "View Employees", //done
         "View All Roles", 
         "Add Employee", // optimization
         "Add Role Or Department", //optimization
@@ -33,17 +31,9 @@ function start() {
     })
     .then(function(answer) {
       switch (answer.EmployeeTracker) {
-        case "View All Employees":
-          viewAllEmployees();
+        case "View Employees":
+          viewEmployees();
           break;
-   
-        case "View All Employees By Department":
-          viewAllEmployeesByDepartment();
-          break;
-        case "View All Employees By Manager":
-          viewAllEmployeesByManager();
-          break;
-
         case "Add Employee":
           addEmployee();
           break;
@@ -59,15 +49,46 @@ function start() {
 }
     
 //done
+function viewEmployees() {
+    inquirer
+    .prompt({
+      name: "ViewBy",
+      type: "list",
+      message: "Want to narrow down results?",
+      choices: [
+        "View All Employees",
+        "View By Department", //done
+        "View By Manager", //stuck
+        "EXIT"
+      ]
+    })
+    .then(function(answer) {
+      switch (answer.ViewBy) {   
+        case "View All Employees":
+          viewAllEmployees();
+          break;
+        case "View By Department":
+          viewByDepartment();
+          break;
+        case "View By Manager":
+          viewByManager();
+          break;
+        default:
+          start();
+          break;
+      }
+    });
+}
+//done
 function viewAllEmployees() {
   connection.query("SELECT first_name, last_name, title, salary FROM employees LEFT JOIN role ON employees.role_id = role.id", function(err, res) {
     if (err) throw err;
     console.table(res);
-    start()
+    viewEmployees();
   })
-}
-//done
-function viewAllEmployeesByDepartment() {
+};
+
+function viewByDepartment() {
   connection.query("SELECT * FROM department", function(err, results) {
     if (err) throw err;
     inquirer
@@ -87,14 +108,17 @@ function viewAllEmployeesByDepartment() {
         var query = "SELECT first_name, last_name, title FROM employees left join role ON employees.role_id = role.id LEFT JOIN department ON role.department_id = department.id WHERE name = ?";
         connection.query(query, [answer.Department], function(err, res) {
           if (err) throw err;
+          if (answer.Department != "ceo" || "Vice President"){
+            console.log("Here's all those who work in the " + answer.Department + " department.")
+          }
           console.table(res)
-          start()
+          viewEmployees()
         });
       });    
   })
 }
 //on hold
-function viewAllEmployeesByManager() {
+function viewByManager() {
   connection.query("SELECT * FROM employees", function(err, results) {
     if (err) throw err;
     inquirer
@@ -115,11 +139,14 @@ function viewAllEmployeesByManager() {
         connection.query(query, [answer.Manager], function(err, res) {
           if (err) throw err;
           console.table(res)
+          
           start()
         });
-      });    
+      }); 
   })
-}//working (needs more user friendly spice)
+}
+
+//working (needs more user friendly spice)
 function addEmployee() {
   inquirer
     .prompt([
