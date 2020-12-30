@@ -20,16 +20,14 @@ function start() {
       name: "EmployeeTracker",
       type: "list",
       message: "What would you like to do?",
-      choices: ["View All Employees",
-        "View All Employees By Department",
-        "View All Employees By Manager",
-        "Add Employee",
-        "Remove Employee",
-        "Update Employee Role",
-        "Update Employee Manager",
-        "View All Roles",
-        "Add Role",
-        "Remove Role",
+      choices: [
+        "View All Employees", //done
+        "View All Employees By Department", //done
+        "View All Employees By Manager", //stuck
+        "View All Roles", 
+        "Add Employee", // optimization
+        "Add Role Or Department", //optimization
+        "Make Changes", //update and delete employees, roles and or departments
         "EXIT"
       ]
     })
@@ -49,12 +47,14 @@ function start() {
         case "Add Employee":
           addEmployee();
           break;
+        case "Add Role Or Department":
+          addSomething();
+          break;
       
         default:
           connection.end();
           break;
       }
-     
     });
 }
     
@@ -119,7 +119,7 @@ function viewAllEmployeesByManager() {
         });
       });    
   })
-}//needs work
+}//working (needs more user friendly spice)
 function addEmployee() {
   inquirer
     .prompt([
@@ -160,4 +160,64 @@ function addEmployee() {
         }
       )
     })
+}
+function addSomething() {
+  inquirer
+    .prompt([
+      {
+      name: "addToWhat",
+      type: "list",
+      message: "Where are you adding to?",
+      choices: ["Roles", "Departments"]
+    }])
+    .then(function(answer) {
+      switch (answer.addToWhat) {
+        case "Roles":
+          addRole();
+          break;
+    
+        case "Departments":
+          addDepartment();
+          break;
+        default: 
+          start()
+          break;
+    }})
+}
+//working (needs more user friendly spice)
+function addRole() {
+  inquirer
+  .prompt([
+    {
+      name: "title",
+      type: "input",
+      message: "What's the title of this new role?"
+    },
+    {
+      name: "salary",
+      type: "input",
+      message: "What's the salary for this role?"
+    },
+    {
+
+      name: "department_id",
+      type: "input",
+      message: "What Department Id does this role belong to?"
+    }
+  ])
+  .then(function(answer) {
+    connection.query(
+      "INSERT INTO role SET ?",
+      {
+        title: answer.title,
+        salary: answer.salary,
+        department_id: answer.department_id || null,
+      },
+      function(err) {
+        if (err) throw err;
+        console.log("Role successfully added.")
+        start()
+      }
+    )
+  })
 }
