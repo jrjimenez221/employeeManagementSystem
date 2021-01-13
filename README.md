@@ -1,18 +1,14 @@
-# Issues
-### View Employee by Manager : Line 155
-    * Display Employee Names to select from
-    * Once chosen return employees who have a matching reports_to to the
-      selected employee's id.
-### View Department Budget : Line 196
-    * Display Departments to choose from
-    * Make a Sum of the salaries of all employees working there 
-### Change Employee Role : Line 265
-    * Display employees + role to choose from
-    * Display role to change employee's role into
+# Employee Management System
 
-## Notes
-* Removed extra code for readability
-* All three issues relate to how I'm attempting to make 2 connection queries
-* After writing this README I think I'll try to write some external
-   functions to hold the second connection query
-* I would really appreciate this
+A Content Management System built for employers with ease of access in mind. Using Node, Inquirer, and MySQL, the user will be able to add, change and delete multiple sections of the database to fit their company needs. 
+
+![Main Menu](assets/EMS.png)
+
+## Features
+
+* View all employees or:
+    * By department
+    * By manager
+* View Roles/Departments
+* Add Employee/Role or Department
+
