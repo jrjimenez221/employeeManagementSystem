@@ -1,7 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
-//import { viewDepartments } from "./functions/viewDepartments"
+//import viewDepartments from "./functions/viewDepartments";
+const fun = require('./functions/viewDepartments')
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -206,34 +207,6 @@ function viewRoles() {
 //     start();
 //   });
 // };
- function viewDepartmentBudget() {
-  console.log("-under construction-")
-  start()
-}
-//   connection.query("SELECT * FROM department", function(err, results) {
-//     if (err) throw err;
-//     inquirer
-//     .prompt([
-//       {
-//         name: "department",
-//         type: "rawlist",
-//         message: "Which department's budget do you wanna take a look at?",
-//         choices: function () {
-//           var choiceArray = [];
-//           for (var i = 0; i < results.length; i++) {
-//             choiceArray.push(
-//               results[i].name,
-//               );
-//             }
-//             return choiceArray;
-//           },
-//         }
-//       ])
-//     }) 
-//     .then(answer)
-//   }
-  //connection.query(" SELECT SUM(salary) FROM department WHERE name = ?")
-//select *,(maths + chemistry + physics ) AS total FROM `student`
 
 
 //Add New employee - important enough to warrant a place in the main menu
@@ -404,48 +377,100 @@ function changeEmployeeRole() {
     inquirer
       .prompt([
         {
-        name: "employeeInQuestion",
+        name: "id",
         type: "list",
         message: "Which employee's moving up or down in the world today?",
         choices: function () {
-          var choiceArray = [];
+          var employeeArray = [];
           for (var i = 0; i < results.length; i++) {
-            choiceArray.push(
-              results[i].first_name + " " + results[i].last_name + " - " + results[i].title,
+            employeeArray.push(
+              {name: results[i].first_name + " " + results[i].last_name + " - " + results[i].title,
+              value: results[i].id
+              }
               );
             }
-            return choiceArray;
+            return employeeArray;
           },
         }])
-        .then(function (answer) {
-          // let employeeInQuestionRole = answer.first_name;
-          // console.log(employeeInQuestionRole)
-          console.log(answer)
-          console.log(answer.first_name)
-          con
+
+        .then(function (employee) {
+          console.log("selected employee has id of: "+employee.id)
 
           connection.query("SELECT * FROM role", function (err, results) {
           if (err) throw err;
           inquirer
             .prompt([
               {
-                name: "whatRole",
+                name: "rId",
                 type: "list",
-                message: "Change " + answer + "'s role to?",
+                message: "Change " + employee.first_name + "'s role to?",
                 choices: function () {
-                  var choiceArray2 = [];
+                  var roleArray2 = [];
                   for (var i = 0; i < results.length; i++) {
-                    choiceArray2.push(
-                      results[i].first_name + " " + results[i].last_name + " " + results[i].title,
+                    roleArray2.push(
+                      {name: results[i].title,
+                      value: results[i].id
+                      }
                       );
                   }
-                  return choiceArray2;
+                  return roleArray2;
                 }
-              }
-            ])
+              }])
+
+              .then(function(role) {
+                console.log("selected role has id of: "+role.rId)
+                console.log("selected employee has id of: "+employee.id)
+
+                connection.query(
+                  "UPDATE employees SET role_id = (?) where id = ?",
+                  {
+                    role: role.rId
+                  },
+                  {
+                    id: employee.id
+                  },
+                  function (err) {
+                    if (err) throw err;
+                    console.log("employee succesfully updated");
+                    makeChanges();
+                  }
+                )
+              })
+
+          })
         })
       })
-  })
 };
 
-// Change Employee Role, View Employee by Manager, View Department Budget
+// Change Employee Role, View Department Budget
+
+function viewDepartmentBudget() {
+  console.log(" ")
+  console.log("-under construction-")
+  console.log(" ")
+  start()
+}
+//   connection.query("SELECT * FROM department", function(err, results) {
+//     if (err) throw err;
+//     inquirer
+//     .prompt([
+//       {
+//         name: "department",
+//         type: "rawlist",
+//         message: "Which department's budget do you wanna take a look at?",
+//         choices: function () {
+//           var choiceArray = [];
+//           for (var i = 0; i < results.length; i++) {
+//             choiceArray.push(
+//               results[i].name,
+//               );
+//             }
+//             return choiceArray;
+//           },
+//         }
+//       ])
+//     }) 
+//     .then(answer)
+//   }
+  //connection.query(" SELECT SUM(salary) FROM department WHERE name = ?")
+//select *,(maths + chemistry + physics ) AS total FROM `student`
