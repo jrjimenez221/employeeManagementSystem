@@ -1,6 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+//import { viewDepartments } from "./functions/viewDepartments"
+
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -12,7 +14,25 @@ connection.connect(function (err) {
   if (err) throw err;
   start();
 });
-//Main Menu
+console.log(`%c 
+
+
+
+
+
+
+
+
+ _______             _                            _______                                                          ______                              
+(_______)           | |                          (_______)                                                 _      / _____)             _               
+ _____   ____  ____ | | ___  _   _ _____ _____    _  _  _ _____ ____  _____  ____ _____ ____  _____ ____ _| |_   ( (____  _   _  ___ _| |_ _____ ____  
+|  ___) |    \\|  _ \\| |/ _ \\| | | | ___ | ___ |  | ||_|| (____ |  _ \\(____ |/ _  | ___ |    \\| ___ |  _ (_   _)   \\____ \\| | | |/___|_   _) ___ |    \\ 
+| |_____| | | | |_| | | |_| | |_| | ____| ____|  | |   | / ___ | | | / ___ ( (_| | ____| | | | ____| | | || |_    _____) ) |_| |___ | | |_| ____| | | |
+|_______)_|_|_|  __/ \\_)___/ \\__  |_____)_____)  |_|   |_\\_____|_| |_\\_____|\\___ |_____)_|_|_|_____)_| |_| \\__)  (______/ \\__  (___/   \\__)_____)_|_|_|
+              |_|           (____/                                         (_____|                                       (____/                        
+
+ `, "font-family:monospace")
+    //Main Menu
 function start() {
   inquirer
     .prompt({
@@ -70,7 +90,7 @@ function viewEmployees() {
         "View All Employees",
         "View By Department", //done
         "View By Manager", //stuck
-        "EXIT",
+        "Return",
       ],
     })
     .then(function (answer) {
@@ -137,27 +157,30 @@ function viewByDepartment() {
 };
 //on hold
 function viewByManager() {
-  connection.query("SELECT * FROM employees", function (err, results) {
+  connection.query("SELECT * FROM employees LEFT JOIN role ON employees.role_id = role.id", function (err, results) {
     if (err) throw err;
     inquirer
       .prompt({
-        name: "Manager",
-        type: "rawlist",
+        name: "id",
+        type: "list",
         message: "Whose underlings are we searching for?",
         choices: function () {
           var choiceArray = [];
           for (var i = 0; i < results.length; i++) {
             choiceArray.push(
-              results[i].first_name + " " + results[i].last_name
+              {name: results[i].first_name + " " + results[i].last_name,
+               value: results[i].id   
+            }
+              // let person[i] = results[i].first_name + results[i].last_name + results[i].id  
             );
           }
           return choiceArray;
         },
       })
-      .then(function (answer) {
-        var query =
-          "SELECT first_name, last_name FROM employees LEFT JOIN role ON employees.role_id = role.id WHERE reports_to = ?";
-        connection.query(query, [answer.first_name], function (err, res) {
+      .then(function (manager) {    
+        console.log(manager.id)
+         var query ="SELECT first_name, last_name FROM employees  WHERE reports_to = ?";
+        connection.query(query, [manager.id], function (err, res) {
           if (err) throw err;
           console.table(res);
           start();
@@ -175,14 +198,14 @@ function viewRoles() {
     start();
   });
 };
-function viewDepartments() {
-  connection.query("SELECT * FROM department", function (err, res) {
-    if (err) throw err;
-    console.table(res);
-    console.log("Here's the Departments we have in our company.");
-    start();
-  });
-};
+// function viewDepartments() {
+//   connection.query("SELECT * FROM department", function (err, res) {
+//     if (err) throw err;
+//     console.table(res);
+//     console.log("Here's the Departments we have in our company.");
+//     start();
+//   });
+// };
  function viewDepartmentBudget() {
   console.log("-under construction-")
   start()
@@ -395,8 +418,11 @@ function changeEmployeeRole() {
           },
         }])
         .then(function (answer) {
-          let employeeInQuestionRole = answer.first_name;
-          console.log(employeeInQuestionRole)
+          // let employeeInQuestionRole = answer.first_name;
+          // console.log(employeeInQuestionRole)
+          console.log(answer)
+          console.log(answer.first_name)
+          con
 
           connection.query("SELECT * FROM role", function (err, results) {
           if (err) throw err;
