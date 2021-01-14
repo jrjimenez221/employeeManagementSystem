@@ -1,5 +1,6 @@
 USE employeeTrackerDB;
 
+
 INSERT INTO employees(first_name, last_name, role_id)
 VALUES ("Jose", "Jimenez", 1);
 INSERT INTO employees(first_name, last_name, role_id)

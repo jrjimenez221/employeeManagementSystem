@@ -180,7 +180,7 @@ function viewByManager() {
       })
       .then(function (manager) {    
         console.log(manager.id)
-         var query ="SELECT first_name, last_name FROM employees  WHERE reports_to = ?";
+         var query ="SELECT * FROM employees left join role on employees.role_id = role.id WHERE reports_to = ?";
         connection.query(query, [manager.id], function (err, res) {
           if (err) throw err;
           console.table(res);
@@ -259,7 +259,7 @@ function makeChanges() {
       {
         name: "changeBeingMade",
         type: "list",
-        message: "The world is ever changing and so is this company!",
+        message: "What are we changing?",
         choices: ["Add Role Or Department", "Change Employee Role", "Return"],
       },
     ])
@@ -372,14 +372,14 @@ function addDepartment() {
 };
 
 function changeEmployeeRole() {
-  connection.query("SELECT * FROM employees LEFT JOIN role ON employees.role_id = role.id", function (err, results) {
+  connection.query("SELECT first_name, last_name, employees.id, title FROM employees LEFT JOIN role ON employees.role_id = role.id", function (err, results) {
     if (err) throw err;
     inquirer
       .prompt([
         {
         name: "id",
         type: "list",
-        message: "Which employee's moving up or down in the world today?",
+        message: "Who's getting a promotion/demotion?",
         choices: function () {
           var employeeArray = [];
           for (var i = 0; i < results.length; i++) {
@@ -422,19 +422,24 @@ function changeEmployeeRole() {
                 console.log("selected employee has id of: "+employee.id)
 
                 connection.query(
-                  "UPDATE employees SET role_id = (?) where id = ?",
-                  {
-                    role: role.rId
+                  // "UPDATE employees  SET role_id = 2 where id = 1 
+                  "UPDATE employees SET ? WHERE ?",
+                  // "UPDATE employees SET ? where ?",
+                  [
+                    {role_Id: role.rId
                   },
-                  {
-                    id: employee.id
-                  },
-                  function (err) {
-                    if (err) throw err;
+                    {
+                      id: employee.id
+                    }
+                  ],
+                  function (error) {
+                    if (error) throw err;
                     console.log("employee succesfully updated");
                     makeChanges();
                   }
-                )
+                );
+
+                
               })
 
           })
